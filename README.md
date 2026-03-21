@@ -1,26 +1,10 @@
-# gstack
+# kstack
 
-Hi, I'm [Garry Tan](https://x.com/garrytan). I'm President & CEO of [Y Combinator](https://www.ycombinator.com/), where I've worked with thousands of startups including Coinbase, Instacart, and Rippling when the founders were just one or two people in a garage — companies now worth tens of billions of dollars. Before YC, I designed the Palantir logo and was one of the first eng manager/PM/designers there. I cofounded Posterous, a blog platform we sold to Twitter. I built Bookface, YC's internal social network, back in 2013. I've been building products as a designer, PM, and eng manager for a long time.
+This is my personal fork of [garrytan/gstack](https://github.com/garrytan/gstack) — customized with my own skills and tuned for my specific workflows.
 
-And right now I am in the middle of something that feels like a new era entirely.
+**kstack** keeps everything from the upstream gstack (all 25+ slash commands, the browse binary, the full sprint process) and adds my own skills and workflow adjustments on top.
 
-In the last 60 days I have written **over 600,000 lines of production code** — 35% tests — and I am doing **10,000 to 20,000 usable lines of code per day** as a part-time part of my day while doing all my duties as CEO of YC. That is not a typo. My last `/retro` (developer stats from the last 7 days) across 3 projects: **140,751 lines added, 362 commits, ~115k net LOC**. The models are getting dramatically better every week. We are at the dawn of something real — one person shipping at a scale that used to require a team of twenty.
-
-**2026 — 1,237 contributions and counting:**
-
-![GitHub contributions 2026 — 1,237 contributions, massive acceleration in Jan-Mar](docs/images/github-2026.png)
-
-**2013 — when I built Bookface at YC (772 contributions):**
-
-![GitHub contributions 2013 — 772 contributions building Bookface at YC](docs/images/github-2013.png)
-
-Same person. Different era. The difference is the tooling.
-
-**gstack is how I do it.** It is my open source software factory. It turns Claude Code into a virtual engineering team you actually manage — a CEO who rethinks the product, an eng manager who locks the architecture, a designer who catches AI slop, a paranoid reviewer who finds production bugs, a QA lead who opens a real browser and clicks through your app, and a release engineer who ships the PR. Eighteen specialists and seven power tools, all as slash commands, all Markdown, **all free, MIT license, available right now.**
-
-I am learning how to get to the edge of what agentic systems can do as of March 2026, and this is my live experiment. I am sharing it because I want the whole world on this journey with me.
-
-Fork it. Improve it. Make it yours. Don't player hate, appreciate.
+**gstack** turns Claude Code into a virtual engineering team you actually manage — a CEO who rethinks the product, an eng manager who locks the architecture, a designer who catches AI slop, a paranoid reviewer who finds production bugs, a QA lead who opens a real browser and clicks through your app, and a release engineer who ships the PR. Eighteen specialists and seven power tools, all as slash commands, all Markdown, **all free, MIT license, available right now.**
 
 **Who this is for:**
 - **Founders and CEOs** — especially technical ones who still want to ship. This is how you build like a team of twenty.
@@ -48,7 +32,7 @@ Expect first useful run in under 5 minutes on any repo with tests already set up
 
 Open Claude Code and paste this. Claude does the rest.
 
-> Install gstack: run **`git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`** then add a "gstack" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade. Then ask the user if they also want to add gstack to the current project so teammates get it.
+> Install gstack: run **`git clone https://github.com/danhkhoi/kstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`** then add a "gstack" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade. Then ask the user if they also want to add gstack to the current project so teammates get it.
 
 ### Step 2: Add to your repo so teammates get it (optional)
 
@@ -61,14 +45,14 @@ Real files get committed to your repo (not a submodule), so `git clone` just wor
 gstack works on any agent that supports the [SKILL.md standard](https://github.com/anthropics/claude-code). Skills live in `.agents/skills/` and are discovered automatically.
 
 ```bash
-git clone https://github.com/garrytan/gstack.git ~/.codex/skills/gstack
+git clone https://github.com/danhkhoi/kstack.git ~/.codex/skills/gstack
 cd ~/.codex/skills/gstack && ./setup --host codex
 ```
 
 Or let setup auto-detect which agents you have installed:
 
 ```bash
-git clone https://github.com/garrytan/gstack.git ~/gstack
+git clone https://github.com/danhkhoi/kstack.git ~/gstack
 cd ~/gstack && ./setup --host auto
 ```
 
@@ -196,21 +180,9 @@ The sprint structure is what makes parallelism work. Without a process, ten agen
 
 ---
 
-## Come ride the wave
+Eighteen specialists and seven power tools. All slash commands. All Markdown. All free. **[github.com/danhkhoi/kstack](https://github.com/danhkhoi/kstack)** — MIT License
 
-This is **free, MIT licensed, open source, available now.** No premium tier. No waitlist. No strings.
-
-I open sourced how I do development and I am actively upgrading my own software factory here. You can fork it and make it your own. That's the whole point. I want everyone on this journey.
-
-Same tools, different outcome — because gstack gives you structured roles and review gates, not generic agent chaos. That governance is the difference between shipping fast and shipping reckless.
-
-The models are getting better fast. The people who figure out how to work with them now — really work with them, not just dabble — are going to have a massive advantage. This is that window. Let's go.
-
-Eighteen specialists and seven power tools. All slash commands. All Markdown. All free. **[github.com/garrytan/gstack](https://github.com/garrytan/gstack)** — MIT License
-
-> **We're hiring.** Want to ship 10K+ LOC/day and help harden gstack?
-> Come work at YC — [ycombinator.com/software](https://ycombinator.com/software)
-> Extremely competitive salary and equity. San Francisco, Dogpatch District.
+> Upstream: [github.com/garrytan/gstack](https://github.com/garrytan/gstack)
 
 ## Docs
 

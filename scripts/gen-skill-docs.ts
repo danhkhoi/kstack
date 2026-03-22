@@ -39,16 +39,16 @@ interface HostPaths {
 
 const HOST_PATHS: Record<Host, HostPaths> = {
   claude: {
-    skillRoot: '~/.claude/skills/gstack',
-    localSkillRoot: '.claude/skills/gstack',
-    binDir: '~/.claude/skills/gstack/bin',
-    browseDir: '~/.claude/skills/gstack/browse/dist',
+    skillRoot: '~/.claude/skills/kstack',
+    localSkillRoot: '.claude/skills/kstack',
+    binDir: '~/.claude/skills/kstack/bin',
+    browseDir: '~/.claude/skills/kstack/browse/dist',
   },
   codex: {
-    skillRoot: '~/.codex/skills/gstack',
-    localSkillRoot: '.agents/skills/gstack',
-    binDir: '~/.codex/skills/gstack/bin',
-    browseDir: '~/.codex/skills/gstack/browse/dist',
+    skillRoot: '~/.codex/skills/kstack',
+    localSkillRoot: '.agents/skills/kstack',
+    binDir: '~/.codex/skills/kstack/bin',
+    browseDir: '~/.codex/skills/kstack/browse/dist',
   },
 };
 
@@ -141,36 +141,26 @@ function generatePreambleBash(ctx: TemplateContext): string {
   return `## Preamble (run first)
 
 \`\`\`bash
-_UPD=$(${ctx.paths.binDir}/gstack-update-check 2>/dev/null || ${ctx.paths.localSkillRoot}/bin/gstack-update-check 2>/dev/null || true)
+_UPD=$(${ctx.paths.binDir}/kstack-update-check 2>/dev/null || ${ctx.paths.localSkillRoot}/bin/kstack-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ~/.gstack/sessions
-touch ~/.gstack/sessions/"$PPID"
-_SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(${ctx.paths.binDir}/gstack-config get gstack_contributor 2>/dev/null || true)
-_PROACTIVE=$(${ctx.paths.binDir}/gstack-config get proactive 2>/dev/null || echo "true")
+mkdir -p ~/.kstack/sessions
+touch ~/.kstack/sessions/"$PPID"
+find ~/.kstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
+_CONTRIB=$(${ctx.paths.binDir}/kstack-config get kstack_contributor 2>/dev/null || true)
+_PROACTIVE=$(${ctx.paths.binDir}/kstack-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-_LAKE_SEEN=$([ -f ~/.gstack/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f ~/.kstack/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.claude/skills/gstack/bin/gstack-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ~/.gstack/.telemetry-prompted ] && echo "yes" || echo "no")
-_TEL_START=$(date +%s)
-_SESSION_ID="$$-$(date +%s)"
-echo "TELEMETRY: \${_TEL:-off}"
-echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.gstack/analytics
-echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.gstack/analytics/.pending-*; do [ -f "$_PF" ] && ${ctx.paths.binDir}/gstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 \`\`\``;
 }
 
 function generateUpgradeCheck(ctx: TemplateContext): string {
-  return `If \`PROACTIVE\` is \`"false"\`, do not proactively suggest gstack skills — only invoke
+  return `If \`PROACTIVE\` is \`"false"\`, do not proactively suggest kstack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`${ctx.paths.skillRoot}/gstack-upgrade/SKILL.md\` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If \`JUST_UPGRADED <from> <to>\`: tell user "Running gstack v{to} (just updated!)" and continue.`;
+If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`${ctx.paths.skillRoot}/upgrade/SKILL.md\` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If \`JUST_UPGRADED <from> <to>\`: tell user "Running kstack v{to} (just updated!)" and continue.`;
 }
 
 function generateLakeIntro(): string {
@@ -181,46 +171,12 @@ Then offer to open the essay in their default browser:
 
 \`\`\`bash
 open https://garryslist.org/posts/boil-the-ocean
-touch ~/.gstack/.completeness-intro-seen
+touch ~/.kstack/.completeness-intro-seen
 \`\`\`
 
 Only run \`open\` if the user says yes. Always run \`touch\` to mark as seen. This only happens once.`;
 }
 
-function generateTelemetryPrompt(ctx: TemplateContext): string {
-  return `If \`TEL_PROMPTED\` is \`no\` AND \`LAKE_INTRO\` is \`yes\`: After the lake intro is handled,
-ask the user about telemetry. Use AskUserQuestion:
-
-> Help gstack get better! Community mode shares usage data (which skills you use, how long
-> they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
-> No code, file paths, or repo names are ever sent.
-> Change anytime with \`gstack-config set telemetry off\`.
-
-Options:
-- A) Help gstack get better! (recommended)
-- B) No thanks
-
-If A: run \`${ctx.paths.binDir}/gstack-config set telemetry community\`
-
-If B: ask a follow-up AskUserQuestion:
-
-> How about anonymous mode? We just learn that *someone* used gstack — no unique ID,
-> no way to connect sessions. Just a counter that helps us know if anyone's out there.
-
-Options:
-- A) Sure, anonymous is fine
-- B) No thanks, fully off
-
-If B→A: run \`${ctx.paths.binDir}/gstack-config set telemetry anonymous\`
-If B→B: run \`${ctx.paths.binDir}/gstack-config set telemetry off\`
-
-Always run:
-\`\`\`bash
-touch ~/.gstack/.telemetry-prompted
-\`\`\`
-
-This only happens once. If \`TEL_PROMPTED\` is \`yes\`, skip this entirely.`;
-}
 
 function generateAskUserFormat(_ctx: TemplateContext): string {
   return `## AskUserQuestion Format
@@ -278,7 +234,7 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 
 Log eureka moments:
 \`\`\`bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.gstack/analytics/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.kstack/analytics/eureka.jsonl 2>/dev/null || true
 \`\`\`
 Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 
@@ -296,7 +252,7 @@ If \`_CONTRIB\` is \`true\`: you are in **contributor mode**. You're a gstack us
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
-**To file:** write \`~/.gstack/contributor-logs/{slug}.md\` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+**To file:** write \`~/.kstack/contributor-logs/{slug}.md\` with **all sections below** (do not truncate — include every section through the Date/Version footer):
 
 \`\`\`
 # {Title}
@@ -349,42 +305,13 @@ REASON: [1-2 sentences]
 ATTEMPTED: [what you tried]
 RECOMMENDATION: [what the user should do next]
 \`\`\`
-
-## Telemetry (run last)
-
-After the skill workflow completes (success, error, or abort), log the telemetry event.
-Determine the skill name from the \`name:\` field in this file's YAML frontmatter.
-Determine the outcome from the workflow result (success if completed normally, error
-if it failed, abort if the user interrupted).
-
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-\`~/.gstack/analytics/\` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
-Skipping this command loses session duration and outcome data.
-
-Run this bash:
-
-\`\`\`bash
-_TEL_END=$(date +%s)
-_TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.gstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/gstack/bin/gstack-telemetry-log \\
-  --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \\
-  --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
-\`\`\`
-
-Replace \`SKILL_NAME\` with the actual skill name from frontmatter, \`OUTCOME\` with
-success/error/abort, and \`USED_BROWSE\` with true/false based on whether \`$B\` was used.
-If you cannot determine the outcome, use "unknown". This runs in the background and
-never blocks the user.`;
-}
+`;}
 
 function generatePreamble(ctx: TemplateContext): string {
   return [
     generatePreambleBash(ctx),
     generateUpgradeCheck(ctx),
     generateLakeIntro(),
-    generateTelemetryPrompt(ctx),
     generateAskUserFormat(ctx),
     generateCompletenessSection(),
     generateSearchBeforeBuildingSection(ctx),
@@ -409,7 +336,7 @@ fi
 \`\`\`
 
 If \`NEEDS_SETUP\`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "kstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: \`cd <SKILL_DIR> && ./setup\`
 3. If \`bun\` is not installed: \`curl -fsSL https://bun.sh/install | bash\``;
 }

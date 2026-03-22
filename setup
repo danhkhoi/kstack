@@ -130,24 +130,30 @@ if ! ensure_playwright_browser; then
   exit 1
 fi
 
-# 3. Ensure ~/.gstack global state directory exists
-mkdir -p "$HOME/.gstack/projects"
+# 3. Ensure ~/.kstack global state directory exists
+mkdir -p "$HOME/.kstack/projects"
 
 # ─── Helper: link Claude skill subdirectories into a skills parent directory ──
+# Sub-skills are installed with the install-dir basename as prefix to avoid
+# conflicts if both kstack and gstack are installed side-by-side.
+# e.g. kstack/qa → ~/.claude/skills/kstack-qa
 link_claude_skill_dirs() {
   local gstack_dir="$1"
   local skills_dir="$2"
+  local bname
+  bname="$(basename "$gstack_dir")"
   local linked=()
   for skill_dir in "$gstack_dir"/*/; do
     if [ -f "$skill_dir/SKILL.md" ]; then
       skill_name="$(basename "$skill_dir")"
       # Skip node_modules
       [ "$skill_name" = "node_modules" ] && continue
-      target="$skills_dir/$skill_name"
+      target_name="${bname}-${skill_name}"
+      target="$skills_dir/$target_name"
       # Create or update symlink; skip if a real file/directory exists
       if [ -L "$target" ] || [ ! -e "$target" ]; then
-        ln -snf "gstack/$skill_name" "$target"
-        linked+=("$skill_name")
+        ln -snf "$bname/$skill_name" "$target"
+        linked+=("$target_name")
       fi
     fi
   done
@@ -262,8 +268,8 @@ if [ "$INSTALL_CODEX" -eq 1 ]; then
 fi
 
 # 7. First-time welcome + legacy cleanup
-if [ ! -d "$HOME/.gstack" ]; then
-  mkdir -p "$HOME/.gstack"
-  echo "  Welcome! Run /gstack-upgrade anytime to stay current."
+if [ ! -d "$HOME/.kstack" ]; then
+  mkdir -p "$HOME/.kstack"
+  echo "  Welcome! Run /kstack-upgrade anytime to stay current."
 fi
-rm -f /tmp/gstack-latest-version
+rm -f /tmp/gstack-latest-version /tmp/kstack-latest-version

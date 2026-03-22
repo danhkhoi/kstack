@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+# kstack-switch — install kstack or revert to garrytan/gstack
+#
+# Usage:
+#   kstack-switch install   — switch ~/.claude/skills/gstack → kstack, install kstack skills
+#   kstack-switch revert    — remove kstack, re-clone garrytan/gstack, restore gstack skills
+#   kstack-switch status    — show what is currently installed
+#
+# Run directly (before kstack is installed as a skill):
+#   bash ~/project/kstack/bin/kstack-switch install
+set -euo pipefail
+
+SKILLS_DIR="$HOME/.claude/skills"
+GSTACK_UPSTREAM="https://github.com/garrytan/gstack.git"
+
+# ─── Helpers ──────────────────────────────────────────────────
+
+die() { echo "ERROR: $*" >&2; exit 1; }
+info() { echo "  $*"; }
+
+# Remove all symlinks in SKILLS_DIR that point into a given subdir
+remove_symlinks_for() {
+  local dir_name="$1"  # e.g. "gstack" or "kstack"
+  local removed=0
+  for f in "$SKILLS_DIR"/*/; do
+    local link="${f%/}"
+    [ -L "$link" ] || continue
+    local target
+    target="$(readlink "$link")"
+    if echo "$target" | grep -qE "^${dir_name}/"; then
+      rm "$link"
+      info "removed symlink: $(basename "$link") → $target"
+      removed=$((removed + 1))
+    fi
+  done
+  # Also catch non-directory symlinks (e.g. gstack-upgrade → gstack/gstack-upgrade)
+  for f in "$SKILLS_DIR"/*; do
+    [ -L "$f" ] || continue
+    local target
+    target="$(readlink "$f")"
+    if echo "$target" | grep -qE "^${dir_name}/"; then
+      rm "$f"
+      info "removed symlink: $(basename "$f") → $target"
+      removed=$((removed + 1))
+    fi
+  done
+  info "removed $removed symlinks pointing into $dir_name/"
+}
+
+# ─── status ───────────────────────────────────────────────────
+
+cmd_status() {
+  echo "=== ~/.claude/skills/ status ==="
+  echo ""
+
+  if [ -d "$SKILLS_DIR/kstack" ]; then
+    local ver
+    ver="$(cat "$SKILLS_DIR/kstack/VERSION" 2>/dev/null || echo "unknown")"
+    local remote
+    remote="$(git -C "$SKILLS_DIR/kstack" remote get-url origin 2>/dev/null || echo "not a git repo")"
+    echo "  kstack  v$ver  ($remote)"
+  else
+    echo "  kstack  NOT INSTALLED"
+  fi
+
+  if [ -d "$SKILLS_DIR/gstack" ]; then
+    local ver
+    ver="$(cat "$SKILLS_DIR/gstack/VERSION" 2>/dev/null || echo "unknown")"
+    local remote
+    remote="$(git -C "$SKILLS_DIR/gstack" remote get-url origin 2>/dev/null || echo "not a git repo")"
+    echo "  gstack  v$ver  ($remote)"
+  else
+    echo "  gstack  NOT INSTALLED"
+  fi
+
+  echo ""
+  echo "=== installed skill symlinks ==="
+  for f in "$SKILLS_DIR"/*; do
+    if [ -L "$f" ]; then
+      echo "  $(basename "$f")  →  $(readlink "$f")"
+    fi
+  done
+}
+
+# ─── install ──────────────────────────────────────────────────
+
+cmd_install() {
+  echo "Installing kstack skills..."
+  echo ""
+
+  # Locate the kstack source repo (this script lives in bin/)
+  KSTACK_REPO="$(cd "$(dirname "$0")/.." && pwd)"
+  [ -f "$KSTACK_REPO/setup" ] || die "Cannot find kstack setup script at $KSTACK_REPO/setup"
+
+  # 1. If gstack/ dir exists and is actually kstack fork (or any dir), handle it
+  if [ -d "$SKILLS_DIR/gstack" ]; then
+    local gstack_remote
+    gstack_remote="$(git -C "$SKILLS_DIR/gstack" remote get-url origin 2>/dev/null || echo "")"
+
+    echo "Step 1: Removing old gstack symlinks..."
+    remove_symlinks_for "gstack"
+
+    echo "Step 2: Renaming gstack/ → kstack/..."
+    if [ -d "$SKILLS_DIR/kstack" ]; then
+      info "kstack/ already exists — removing it first"
+      rm -rf "$SKILLS_DIR/kstack"
+    fi
+    mv "$SKILLS_DIR/gstack" "$SKILLS_DIR/kstack"
+    info "moved: $SKILLS_DIR/gstack → $SKILLS_DIR/kstack"
+  elif [ -d "$SKILLS_DIR/kstack" ]; then
+    echo "Step 1: kstack/ already installed, removing old kstack symlinks..."
+    remove_symlinks_for "kstack"
+    echo "Step 2: (skipped — already in kstack/ dir)"
+  else
+    # Neither exists — clone from user's repo
+    echo "Step 1: Nothing to remove"
+    echo "Step 2: Cloning kstack into $SKILLS_DIR/kstack..."
+    git clone --depth 1 "$(git -C "$KSTACK_REPO" remote get-url origin 2>/dev/null || echo "https://github.com/danhkhoi/kstack.git")" "$SKILLS_DIR/kstack"
+  fi
+
+  # 3. If the source repo is different from the installed one, copy the latest files
+  local installed_real
+  installed_real="$(cd "$SKILLS_DIR/kstack" && pwd -P)"
+  local source_real
+  source_real="$(cd "$KSTACK_REPO" && pwd -P)"
+  if [ "$installed_real" != "$source_real" ] && [ -d "$KSTACK_REPO/browse/dist" ]; then
+    echo "Step 3: Syncing browse binary from dev repo..."
+    cp -f "$KSTACK_REPO/browse/dist/browse" "$SKILLS_DIR/kstack/browse/dist/browse" 2>/dev/null || true
+  fi
+
+  echo "Step 4: Running kstack setup..."
+  "$SKILLS_DIR/kstack/setup"
+
+  echo ""
+  echo "Done! kstack is now installed."
+  echo "Skills available: /kstack  /kstack-qa  /kstack-review  /kstack-ship  ..."
+  echo ""
+  echo "Restart Claude Code for changes to take effect."
+}
+
+# ─── revert ───────────────────────────────────────────────────
+
+cmd_revert() {
+  echo "Reverting to garrytan/gstack..."
+  echo ""
+
+  # 1. Remove kstack symlinks
+  if [ -d "$SKILLS_DIR/kstack" ]; then
+    echo "Step 1: Removing kstack symlinks..."
+    remove_symlinks_for "kstack"
+  else
+    echo "Step 1: No kstack/ dir found, skipping"
+  fi
+
+  # 2. Backup and remove kstack dir (keep it as kstack.bak in case user wants it back)
+  if [ -d "$SKILLS_DIR/kstack" ]; then
+    echo "Step 2: Backing up kstack/ → kstack.bak/ ..."
+    rm -rf "$SKILLS_DIR/kstack.bak"
+    mv "$SKILLS_DIR/kstack" "$SKILLS_DIR/kstack.bak"
+    info "saved to: $SKILLS_DIR/kstack.bak"
+  fi
+
+  # 3. Clone garrytan/gstack fresh
+  echo "Step 3: Cloning garrytan/gstack..."
+  rm -rf "$SKILLS_DIR/gstack"
+  git clone --depth 1 "$GSTACK_UPSTREAM" "$SKILLS_DIR/gstack"
+
+  # 4. Run Gary's setup
+  echo "Step 4: Running gstack setup..."
+  "$SKILLS_DIR/gstack/setup"
+
+  echo ""
+  echo "Done! garrytan/gstack is now installed."
+  echo "Skills available: /gstack  /qa  /review  /ship  ..."
+  echo ""
+  echo "Your kstack backup is at: $SKILLS_DIR/kstack.bak"
+  echo "To restore kstack: mv $SKILLS_DIR/kstack.bak $SKILLS_DIR/kstack && bash $SKILLS_DIR/kstack/bin/kstack-switch install"
+  echo ""
+  echo "Restart Claude Code for changes to take effect."
+}
+
+# ─── dispatch ─────────────────────────────────────────────────
+
+case "${1:-}" in
+  install)  cmd_install ;;
+  revert)   cmd_revert ;;
+  status)   cmd_status ;;
+  *)
+    echo "Usage: kstack-switch {install|revert|status}"
+    echo ""
+    echo "  install  — switch ~/.claude/skills to kstack (your fork)"
+    echo "  revert   — remove kstack, install garrytan/gstack"
+    echo "  status   — show what is currently installed"
+    exit 1
+    ;;
+esac

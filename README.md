@@ -2,22 +2,22 @@
 
 This is my personal fork of [garrytan/gstack](https://github.com/garrytan/gstack) — customized with my own skills and tuned for my specific workflows.
 
-**kstack** keeps everything from the upstream gstack (all 25+ slash commands, the browse binary, the full sprint process) and adds my own skills and workflow adjustments on top.
+**kstack** keeps everything from the upstream gstack (all 25+ slash commands, the browse binary, the full sprint process) with telemetry removed and skills prefixed as `kstack-*`.
 
-**gstack** turns Claude Code into a virtual engineering team you actually manage — a CEO who rethinks the product, an eng manager who locks the architecture, a designer who catches AI slop, a paranoid reviewer who finds production bugs, a QA lead who opens a real browser and clicks through your app, and a release engineer who ships the PR. Eighteen specialists and seven power tools, all as slash commands, all Markdown, **all free, MIT license, available right now.**
+**kstack** turns Claude Code into a virtual engineering team you actually manage — a CEO who rethinks the product, an eng manager who locks the architecture, a designer who catches AI slop, a paranoid reviewer who finds production bugs, a QA lead who opens a real browser and clicks through your app, and a release engineer who ships the PR. Eighteen specialists and seven power tools, all as slash commands, all Markdown, **all free, MIT license, available right now.**
 
 **Who this is for:**
 - **Founders and CEOs** — especially technical ones who still want to ship. This is how you build like a team of twenty.
-- **First-time Claude Code users** — gstack is the best way to start. Structured roles instead of a blank prompt.
+- **First-time Claude Code users** — kstack is the best way to start. Structured roles instead of a blank prompt.
 - **Tech leads and staff engineers** — bring rigorous review, QA, and release automation to every PR
 
 ## Quick start: your first 10 minutes
 
-1. Install gstack (30 seconds — see below)
-2. Run `/office-hours` — describe what you're building. It will reframe the problem before you write a line of code.
-3. Run `/plan-ceo-review` on any feature idea
-4. Run `/review` on any branch with changes
-5. Run `/qa` on your staging URL
+1. Install kstack (30 seconds — see below)
+2. Run `/kstack-office-hours` — describe what you're building. It will reframe the problem before you write a line of code.
+3. Run `/kstack-plan-ceo-review` on any feature idea
+4. Run `/kstack-review` on any branch with changes
+5. Run `/kstack-qa` on your staging URL
 6. Stop there. You'll know if this is for you.
 
 Expect first useful run in under 5 minutes on any repo with tests already set up.
@@ -32,37 +32,37 @@ Expect first useful run in under 5 minutes on any repo with tests already set up
 
 Open Claude Code and paste this. Claude does the rest.
 
-> Install gstack: run **`git clone https://github.com/danhkhoi/kstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`** then add a "gstack" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade. Then ask the user if they also want to add gstack to the current project so teammates get it.
+> Install kstack: run **`git clone https://github.com/danhkhoi/kstack.git ~/.claude/skills/kstack && cd ~/.claude/skills/kstack && ./setup`** then add a "kstack" section to CLAUDE.md that says to use the /kstack-browse skill for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /kstack-office-hours, /kstack-plan-ceo-review, /kstack-plan-eng-review, /kstack-plan-design-review, /kstack-design-consultation, /kstack-review, /kstack-ship, /kstack-land-and-deploy, /kstack-canary, /kstack-benchmark, /kstack-browse, /kstack-qa, /kstack-qa-only, /kstack-design-review, /kstack-setup-browser-cookies, /kstack-setup-deploy, /kstack-retro, /kstack-investigate, /kstack-document-release, /kstack-codex, /kstack-careful, /kstack-freeze, /kstack-guard, /kstack-unfreeze, /kstack-upgrade. Then ask the user if they also want to add kstack to the current project so teammates get it.
 
 ### Step 2: Add to your repo so teammates get it (optional)
 
-> Add gstack to this project: run **`cp -Rf ~/.claude/skills/gstack .claude/skills/gstack && rm -rf .claude/skills/gstack/.git && cd .claude/skills/gstack && ./setup`** then add a "gstack" section to this project's CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade, and tells Claude that if gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to build the binary and register skills.
+> Add kstack to this project: run **`cp -Rf ~/.claude/skills/kstack .claude/skills/kstack && rm -rf .claude/skills/kstack/.git && cd .claude/skills/kstack && ./setup`** then add a "kstack" section to this project's CLAUDE.md that says to use the /kstack-browse skill for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /kstack-office-hours, /kstack-plan-ceo-review, /kstack-plan-eng-review, /kstack-plan-design-review, /kstack-design-consultation, /kstack-review, /kstack-ship, /kstack-land-and-deploy, /kstack-canary, /kstack-benchmark, /kstack-browse, /kstack-qa, /kstack-qa-only, /kstack-design-review, /kstack-setup-browser-cookies, /kstack-setup-deploy, /kstack-retro, /kstack-investigate, /kstack-document-release, /kstack-codex, /kstack-careful, /kstack-freeze, /kstack-guard, /kstack-unfreeze, /kstack-upgrade, and tells Claude that if kstack skills aren't working, run `cd .claude/skills/kstack && ./setup` to build the binary and register skills.
 
 Real files get committed to your repo (not a submodule), so `git clone` just works. Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
 
 ### Codex, Gemini CLI, or Cursor
 
-gstack works on any agent that supports the [SKILL.md standard](https://github.com/anthropics/claude-code). Skills live in `.agents/skills/` and are discovered automatically.
+kstack works on any agent that supports the [SKILL.md standard](https://github.com/anthropics/claude-code). Skills live in `.agents/skills/` and are discovered automatically.
 
 ```bash
-git clone https://github.com/danhkhoi/kstack.git ~/.codex/skills/gstack
-cd ~/.codex/skills/gstack && ./setup --host codex
+git clone https://github.com/danhkhoi/kstack.git ~/.codex/skills/kstack
+cd ~/.codex/skills/kstack && ./setup --host codex
 ```
 
 Or let setup auto-detect which agents you have installed:
 
 ```bash
-git clone https://github.com/danhkhoi/kstack.git ~/gstack
-cd ~/gstack && ./setup --host auto
+git clone https://github.com/danhkhoi/kstack.git ~/kstack
+cd ~/kstack && ./setup --host auto
 ```
 
-This installs to `~/.claude/skills/gstack` and/or `~/.codex/skills/gstack` depending on what's available. All 25 skills work across all supported agents. Hook-based safety skills (careful, freeze, guard) use inline safety advisory prose on non-Claude hosts.
+This installs to `~/.claude/skills/kstack` and/or `~/.codex/skills/kstack` depending on what's available. All 25 skills work across all supported agents. Hook-based safety skills (careful, freeze, guard) use inline safety advisory prose on non-Claude hosts.
 
 ## See it work
 
 ```
 You:    I want to build a daily briefing app for my calendar.
-You:    /office-hours
+You:    /kstack-office-hours
 Claude: [asks about the pain — specific examples, not hypotheticals]
 
 You:    Multiple Google calendars, events with stale info, wrong locations.
@@ -79,23 +79,23 @@ Claude: I'm going to push back on the framing. You said "daily briefing
         the daily briefing that actually works.
         [writes design doc → feeds into downstream skills automatically]
 
-You:    /plan-ceo-review
+You:    /kstack-plan-ceo-review
         [reads the design doc, challenges scope, runs 10-section review]
 
-You:    /plan-eng-review
+You:    /kstack-plan-eng-review
         [ASCII diagrams for data flow, state machines, error paths]
         [test matrix, failure modes, security concerns]
 
 You:    Approve plan. Exit plan mode.
         [writes 2,400 lines across 11 files. ~8 minutes.]
 
-You:    /review
+You:    /kstack-review
         [AUTO-FIXED] 2 issues. [ASK] Race condition → you approve fix.
 
-You:    /qa https://staging.myapp.com
+You:    /kstack-qa https://staging.myapp.com
         [opens real browser, clicks through flows, finds and fixes a bug]
 
-You:    /ship
+You:    /kstack-ship
         Tests: 42 → 51 (+9 new). PR: github.com/you/app/pull/42
 ```
 
@@ -103,76 +103,76 @@ You said "daily briefing app." The agent said "you're building a chief of staff 
 
 ## The sprint
 
-gstack is a process, not a collection of tools. The skills are ordered the way a sprint runs:
+kstack is a process, not a collection of tools. The skills are ordered the way a sprint runs:
 
 **Think → Plan → Build → Review → Test → Ship → Reflect**
 
-Each skill feeds into the next. `/office-hours` writes a design doc that `/plan-ceo-review` reads. `/plan-eng-review` writes a test plan that `/qa` picks up. `/review` catches bugs that `/ship` verifies are fixed. Nothing falls through the cracks because every step knows what came before it.
+Each skill feeds into the next. `/kstack-office-hours` writes a design doc that `/kstack-plan-ceo-review` reads. `/kstack-plan-eng-review` writes a test plan that `/kstack-qa` picks up. `/kstack-review` catches bugs that `/kstack-ship` verifies are fixed. Nothing falls through the cracks because every step knows what came before it.
 
-One sprint, one person, one feature — that takes about 30 minutes with gstack. But here's what changes everything: you can run 10-15 of these sprints in parallel. Different features, different branches, different agents — all at the same time. That is how I ship 10,000+ lines of production code per day while doing my actual job.
+One sprint, one person, one feature — that takes about 30 minutes with kstack. But here's what changes everything: you can run 10-15 of these sprints in parallel. Different features, different branches, different agents — all at the same time. That is how I ship 10,000+ lines of production code per day while doing my actual job.
 
 | Skill | Your specialist | What they do |
 |-------|----------------|--------------|
-| `/office-hours` | **YC Office Hours** | Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill. |
-| `/plan-ceo-review` | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction. |
-| `/plan-eng-review` | **Eng Manager** | Lock in architecture, data flow, diagrams, edge cases, and tests. Forces hidden assumptions into the open. |
-| `/plan-design-review` | **Senior Designer** | Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. AI Slop detection. Interactive — one AskUserQuestion per design choice. |
-| `/design-consultation` | **Design Partner** | Build a complete design system from scratch. Knows the landscape, proposes creative risks, generates realistic product mockups. Design at the heart of all other phases. |
-| `/review` | **Staff Engineer** | Find the bugs that pass CI but blow up in production. Auto-fixes the obvious ones. Flags completeness gaps. |
-| `/investigate` | **Debugger** | Systematic root-cause debugging. Iron Law: no fixes without investigation. Traces data flow, tests hypotheses, stops after 3 failed fixes. |
-| `/design-review` | **Designer Who Codes** | Same audit as /plan-design-review, then fixes what it finds. Atomic commits, before/after screenshots. |
-| `/qa` | **QA Lead** | Test your app, find bugs, fix them with atomic commits, re-verify. Auto-generates regression tests for every fix. |
-| `/qa-only` | **QA Reporter** | Same methodology as /qa but report only. Use when you want a pure bug report without code changes. |
-| `/ship` | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. One command. |
-| `/land-and-deploy` | **Release Engineer** | Merge the PR, wait for CI and deploy, verify production health. Takes over after `/ship`. One command from "approved" to "verified in production." |
-| `/canary` | **SRE** | Post-deploy monitoring loop. Watches for console errors, performance regressions, and page failures. Periodic screenshots and anomaly detection. |
-| `/benchmark` | **Performance Engineer** | Baseline page load times, Core Web Vitals, and resource sizes. Compare before/after on every PR. Catch bundle size regressions before they ship. |
-| `/document-release` | **Technical Writer** | Update all project docs to match what you just shipped. Catches stale READMEs automatically. |
-| `/retro` | **Eng Manager** | Team-aware weekly retro. Per-person breakdowns, shipping streaks, test health trends, growth opportunities. |
-| `/browse` | **QA Engineer** | Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
-| `/setup-browser-cookies` | **Session Manager** | Import cookies from your real browser (Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages. |
+| `/kstack-office-hours` | **YC Office Hours** | Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill. |
+| `/kstack-plan-ceo-review` | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction. |
+| `/kstack-plan-eng-review` | **Eng Manager** | Lock in architecture, data flow, diagrams, edge cases, and tests. Forces hidden assumptions into the open. |
+| `/kstack-plan-design-review` | **Senior Designer** | Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. AI Slop detection. Interactive — one AskUserQuestion per design choice. |
+| `/kstack-design-consultation` | **Design Partner** | Build a complete design system from scratch. Knows the landscape, proposes creative risks, generates realistic product mockups. Design at the heart of all other phases. |
+| `/kstack-review` | **Staff Engineer** | Find the bugs that pass CI but blow up in production. Auto-fixes the obvious ones. Flags completeness gaps. |
+| `/kstack-investigate` | **Debugger** | Systematic root-cause debugging. Iron Law: no fixes without investigation. Traces data flow, tests hypotheses, stops after 3 failed fixes. |
+| `/kstack-design-review` | **Designer Who Codes** | Same audit as /kstack-plan-design-review, then fixes what it finds. Atomic commits, before/after screenshots. |
+| `/kstack-qa` | **QA Lead** | Test your app, find bugs, fix them with atomic commits, re-verify. Auto-generates regression tests for every fix. |
+| `/kstack-qa-only` | **QA Reporter** | Same methodology as /kstack-qa but report only. Use when you want a pure bug report without code changes. |
+| `/kstack-ship` | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. One command. |
+| `/kstack-land-and-deploy` | **Release Engineer** | Merge the PR, wait for CI and deploy, verify production health. Takes over after `/kstack-ship`. One command from "approved" to "verified in production." |
+| `/kstack-canary` | **SRE** | Post-deploy monitoring loop. Watches for console errors, performance regressions, and page failures. Periodic screenshots and anomaly detection. |
+| `/kstack-benchmark` | **Performance Engineer** | Baseline page load times, Core Web Vitals, and resource sizes. Compare before/after on every PR. Catch bundle size regressions before they ship. |
+| `/kstack-document-release` | **Technical Writer** | Update all project docs to match what you just shipped. Catches stale READMEs automatically. |
+| `/kstack-retro` | **Eng Manager** | Team-aware weekly retro. Per-person breakdowns, shipping streaks, test health trends, growth opportunities. |
+| `/kstack-browse` | **QA Engineer** | Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
+| `/kstack-setup-browser-cookies` | **Session Manager** | Import cookies from your real browser (Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages. |
 
 ### Power tools
 
 | Skill | What it does |
 |-------|-------------|
-| `/codex` | **Second Opinion** — independent code review from OpenAI Codex CLI. Three modes: review (pass/fail gate), adversarial challenge, and open consultation. Cross-model analysis when both `/review` and `/codex` have run. |
-| `/careful` | **Safety Guardrails** — warns before destructive commands (rm -rf, DROP TABLE, force-push). Say "be careful" to activate. Override any warning. |
-| `/freeze` | **Edit Lock** — restrict file edits to one directory. Prevents accidental changes outside scope while debugging. |
-| `/guard` | **Full Safety** — `/careful` + `/freeze` in one command. Maximum safety for prod work. |
-| `/unfreeze` | **Unlock** — remove the `/freeze` boundary. |
-| `/setup-deploy` | **Deploy Configurator** — one-time setup for `/land-and-deploy`. Detects your platform, production URL, and deploy commands. |
-| `/gstack-upgrade` | **Self-Updater** — upgrade gstack to latest. Detects global vs vendored install, syncs both, shows what changed. |
+| `/kstack-codex` | **Second Opinion** — independent code review from OpenAI Codex CLI. Three modes: review (pass/fail gate), adversarial challenge, and open consultation. Cross-model analysis when both `/kstack-review` and `/kstack-codex` have run. |
+| `/kstack-careful` | **Safety Guardrails** — warns before destructive commands (rm -rf, DROP TABLE, force-push). Say "be careful" to activate. Override any warning. |
+| `/kstack-freeze` | **Edit Lock** — restrict file edits to one directory. Prevents accidental changes outside scope while debugging. |
+| `/kstack-guard` | **Full Safety** — `/kstack-careful` + `/kstack-freeze` in one command. Maximum safety for prod work. |
+| `/kstack-unfreeze` | **Unlock** — remove the `/kstack-freeze` boundary. |
+| `/kstack-setup-deploy` | **Deploy Configurator** — one-time setup for `/kstack-land-and-deploy`. Detects your platform, production URL, and deploy commands. |
+| `/kstack-upgrade` | **Self-Updater** — upgrade kstack to latest. Detects global vs vendored install, syncs both, shows what changed. |
 
 **[Deep dives with examples and philosophy for every skill →](docs/skills.md)**
 
 ## What's new and why it matters
 
-**`/office-hours` reframes your product before you write code.** You say "daily briefing app." It listens to your actual pain, pushes back on the framing, tells you you're really building a personal chief of staff AI, challenges your premises, and generates three implementation approaches with effort estimates. The design doc it writes feeds directly into `/plan-ceo-review` and `/plan-eng-review` — so every downstream skill starts with real clarity instead of a vague feature request.
+**`/kstack-office-hours` reframes your product before you write code.** You say "daily briefing app." It listens to your actual pain, pushes back on the framing, tells you you're really building a personal chief of staff AI, challenges your premises, and generates three implementation approaches with effort estimates. The design doc it writes feeds directly into `/kstack-plan-ceo-review` and `/kstack-plan-eng-review` — so every downstream skill starts with real clarity instead of a vague feature request.
 
-**Design is at the heart.** `/design-consultation` doesn't just pick fonts. It researches what's out there in your space, proposes safe choices AND creative risks, generates realistic mockups of your actual product, and writes `DESIGN.md` — and then `/design-review` and `/plan-eng-review` read what you chose. Design decisions flow through the whole system.
+**Design is at the heart.** `/kstack-design-consultation` doesn't just pick fonts. It researches what's out there in your space, proposes safe choices AND creative risks, generates realistic mockups of your actual product, and writes `DESIGN.md` — and then `/kstack-design-review` and `/kstack-plan-eng-review` read what you chose. Design decisions flow through the whole system.
 
-**`/qa` was a massive unlock.** It let me go from 6 to 12 parallel workers. Claude Code saying *"I SEE THE ISSUE"* and then actually fixing it, generating a regression test, and verifying the fix — that changed how I work. The agent has eyes now.
+**`/kstack-qa` was a massive unlock.** It let me go from 6 to 12 parallel workers. Claude Code saying *"I SEE THE ISSUE"* and then actually fixing it, generating a regression test, and verifying the fix — that changed how I work. The agent has eyes now.
 
-**Smart review routing.** Just like at a well-run startup: CEO doesn't have to look at infra bug fixes, design review isn't needed for backend changes. gstack tracks what reviews are run, figures out what's appropriate, and just does the smart thing. The Review Readiness Dashboard tells you where you stand before you ship.
+**Smart review routing.** Just like at a well-run startup: CEO doesn't have to look at infra bug fixes, design review isn't needed for backend changes. kstack tracks what reviews are run, figures out what's appropriate, and just does the smart thing. The Review Readiness Dashboard tells you where you stand before you ship.
 
-**Test everything.** `/ship` bootstraps test frameworks from scratch if your project doesn't have one. Every `/ship` run produces a coverage audit. Every `/qa` bug fix generates a regression test. 100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
+**Test everything.** `/kstack-ship` bootstraps test frameworks from scratch if your project doesn't have one. Every `/kstack-ship` run produces a coverage audit. Every `/kstack-qa` bug fix generates a regression test. 100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
 
-**Ship to production in one command.** `/land-and-deploy` picks up where `/ship` left off — merges your PR, waits for CI and deploy, then runs canary verification on your production URL. Auto-detects Fly.io, Render, Vercel, Netlify, Heroku, or GitHub Actions. If something breaks, it offers a revert. Pair with `/canary` for extended post-deploy monitoring and `/benchmark` to catch performance regressions before they ship.
+**Ship to production in one command.** `/kstack-land-and-deploy` picks up where `/kstack-ship` left off — merges your PR, waits for CI and deploy, then runs canary verification on your production URL. Auto-detects Fly.io, Render, Vercel, Netlify, Heroku, or GitHub Actions. If something breaks, it offers a revert. Pair with `/kstack-canary` for extended post-deploy monitoring and `/kstack-benchmark` to catch performance regressions before they ship.
 
-**`/document-release` is the engineer you never had.** It reads every doc file in your project, cross-references the diff, and updates everything that drifted. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — all kept current automatically. And now `/ship` auto-invokes it — docs stay current without an extra command.
+**`/kstack-document-release` is the engineer you never had.** It reads every doc file in your project, cross-references the diff, and updates everything that drifted. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — all kept current automatically. And now `/kstack-ship` auto-invokes it — docs stay current without an extra command.
 
 **Browser handoff when the AI gets stuck.** Hit a CAPTCHA, auth wall, or MFA prompt? `$B handoff` opens a visible Chrome at the exact same page with all your cookies and tabs intact. Solve the problem, tell Claude you're done, `$B resume` picks up right where it left off. The agent even suggests it automatically after 3 consecutive failures.
 
-**Multi-AI second opinion.** `/codex` gets an independent review from OpenAI's Codex CLI — a completely different AI looking at the same diff. Three modes: code review with a pass/fail gate, adversarial challenge that actively tries to break your code, and open consultation with session continuity. When both `/review` (Claude) and `/codex` (OpenAI) have reviewed the same branch, you get a cross-model analysis showing which findings overlap and which are unique to each.
+**Multi-AI second opinion.** `/kstack-codex` gets an independent review from OpenAI's Codex CLI — a completely different AI looking at the same diff. Three modes: code review with a pass/fail gate, adversarial challenge that actively tries to break your code, and open consultation with session continuity. When both `/kstack-review` (Claude) and `/kstack-codex` (OpenAI) have reviewed the same branch, you get a cross-model analysis showing which findings overlap and which are unique to each.
 
-**Safety guardrails on demand.** Say "be careful" and `/careful` warns before any destructive command — rm -rf, DROP TABLE, force-push, git reset --hard. `/freeze` locks edits to one directory while debugging so Claude can't accidentally "fix" unrelated code. `/guard` activates both. `/investigate` auto-freezes to the module being investigated.
+**Safety guardrails on demand.** Say "be careful" and `/kstack-careful` warns before any destructive command — rm -rf, DROP TABLE, force-push, git reset --hard. `/kstack-freeze` locks edits to one directory while debugging so Claude can't accidentally "fix" unrelated code. `/kstack-guard` activates both. `/kstack-investigate` auto-freezes to the module being investigated.
 
-**Proactive skill suggestions.** gstack notices what stage you're in — brainstorming, reviewing, debugging, testing — and suggests the right skill. Don't like it? Say "stop suggesting" and it remembers across sessions.
+**Proactive skill suggestions.** kstack notices what stage you're in — brainstorming, reviewing, debugging, testing — and suggests the right skill. Don't like it? Say "stop suggesting" and it remembers across sessions.
 
 ## 10-15 parallel sprints
 
-gstack is powerful with one sprint. It is transformative with ten running at once.
+kstack is powerful with one sprint. It is transformative with ten running at once.
 
 [Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. One session running `/office-hours` on a new idea, another doing `/review` on a PR, a third implementing a feature, a fourth running `/qa` on staging, and six more on other branches. All at the same time. I regularly run 10-15 parallel sprints — that's the practical max right now.
 
@@ -182,7 +182,7 @@ The sprint structure is what makes parallelism work. Without a process, ten agen
 
 Eighteen specialists and seven power tools. All slash commands. All Markdown. All free. **[github.com/danhkhoi/kstack](https://github.com/danhkhoi/kstack)** — MIT License
 
-> Upstream: [github.com/garrytan/gstack](https://github.com/garrytan/gstack)
+> Fork of [github.com/garrytan/gstack](https://github.com/garrytan/gstack). No telemetry. See [FORK_DIFF.md](FORK_DIFF.md) for what changed.
 
 ## Docs
 
@@ -195,39 +195,33 @@ Eighteen specialists and seven power tools. All slash commands. All Markdown. Al
 | [Contributing](CONTRIBUTING.md) | Dev setup, testing, contributor mode, and dev mode |
 | [Changelog](CHANGELOG.md) | What's new in every version |
 
-## Privacy & Telemetry
+## Privacy
 
-gstack includes **opt-in** usage telemetry to help improve the project. Here's exactly what happens:
+kstack sends **no telemetry**. Nothing is phoned home. No Supabase, no analytics endpoints, no opt-in prompts. Local analytics are still available — run `kstack-analytics` to see your personal usage dashboard from the local JSONL file.
 
-- **Default is off.** Nothing is sent anywhere unless you explicitly say yes.
-- **On first run,** gstack asks if you want to share anonymous usage data. You can say no.
-- **What's sent (if you opt in):** skill name, duration, success/fail, gstack version, OS. That's it.
-- **What's never sent:** code, file paths, repo names, branch names, prompts, or any user-generated content.
-- **Change anytime:** `gstack-config set telemetry off` disables everything instantly.
-
-Data is stored in [Supabase](https://supabase.com) (open source Firebase alternative). The schema is in [`supabase/migrations/001_telemetry.sql`](supabase/migrations/001_telemetry.sql) — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies restrict it to insert-only access.
-
-**Local analytics are always available.** Run `gstack-analytics` to see your personal usage dashboard from the local JSONL file — no remote data needed.
+This is a fork of [garrytan/gstack](https://github.com/garrytan/gstack) with telemetry fully removed. See [FORK_DIFF.md](FORK_DIFF.md) for the full list of changes.
 
 ## Troubleshooting
 
-**Skill not showing up?** `cd ~/.claude/skills/gstack && ./setup`
+**Skill not showing up?** `cd ~/.claude/skills/kstack && ./setup`
 
-**`/browse` fails?** `cd ~/.claude/skills/gstack && bun install && bun run build`
+**`/kstack-browse` fails?** `cd ~/.claude/skills/kstack && bun install && bun run build`
 
-**Stale install?** Run `/gstack-upgrade` — or set `auto_upgrade: true` in `~/.gstack/config.yaml`
+**Stale install?** Run `/kstack-upgrade` — or set `auto_upgrade: true` in `~/.kstack/config.yaml`
 
-**Windows users:** gstack works on Windows 11 via Git Bash or WSL. Node.js is required in addition to Bun — Bun has a known bug with Playwright's pipe transport on Windows ([bun#4253](https://github.com/oven-sh/bun/issues/4253)). The browse server automatically falls back to Node.js. Make sure both `bun` and `node` are on your PATH.
+**Windows users:** kstack works on Windows 11 via Git Bash or WSL. Node.js is required in addition to Bun — Bun has a known bug with Playwright's pipe transport on Windows ([bun#4253](https://github.com/oven-sh/bun/issues/4253)). The browse server automatically falls back to Node.js. Make sure both `bun` and `node` are on your PATH.
 
-**Claude says it can't see the skills?** Make sure your project's `CLAUDE.md` has a gstack section. Add this:
+**Claude says it can't see the skills?** Make sure your project's `CLAUDE.md` has a kstack section. Add this:
 
 ```
-## gstack
-Use /browse from gstack for all web browsing. Never use mcp__claude-in-chrome__* tools.
-Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
-/design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review,
-/setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful,
-/freeze, /guard, /unfreeze, /gstack-upgrade.
+## kstack
+Use /kstack-browse for all web browsing. Never use mcp__claude-in-chrome__* tools.
+Available skills: /kstack-office-hours, /kstack-plan-ceo-review, /kstack-plan-eng-review,
+/kstack-plan-design-review, /kstack-design-consultation, /kstack-review, /kstack-ship,
+/kstack-browse, /kstack-qa, /kstack-qa-only, /kstack-design-review,
+/kstack-setup-browser-cookies, /kstack-retro, /kstack-investigate,
+/kstack-document-release, /kstack-codex, /kstack-careful, /kstack-freeze,
+/kstack-guard, /kstack-unfreeze, /kstack-upgrade.
 ```
 
 ## License

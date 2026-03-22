@@ -1,6 +1,6 @@
 # Browser — technical details
 
-This document covers the command reference and internals of gstack's headless browser.
+This document covers the command reference and internals of kstack's headless browser.
 
 ## Command reference
 
@@ -23,7 +23,7 @@ All selector arguments accept CSS selectors, `@e` refs after `snapshot`, or `@c`
 
 ## How it works
 
-gstack's browser is a compiled CLI binary that talks to a persistent local Chromium daemon over HTTP. The CLI is a thin client — it reads a state file, sends a command, and prints the response to stdout. The server does the real work via [Playwright](https://playwright.dev/).
+kstack's browser is a compiled CLI binary that talks to a persistent local Chromium daemon over HTTP. The CLI is a thin client — it reads a state file, sends a command, and prints the response to stdout. The server does the real work via [Playwright](https://playwright.dev/).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -178,9 +178,9 @@ No port collisions. No shared state. Each project is fully isolated.
 |------|-----------|-----------------|--------------------------|
 | Chrome MCP | ~5s | ~2-5s | ~2000 tokens (schema + protocol) |
 | Playwright MCP | ~3s | ~1-3s | ~1500 tokens (schema + protocol) |
-| **gstack browse** | **~3s** | **~100-200ms** | **0 tokens** (plain text stdout) |
+| **kstack browse** | **~3s** | **~100-200ms** | **0 tokens** (plain text stdout) |
 
-The context overhead difference compounds fast. In a 20-command browser session, MCP tools burn 30,000-40,000 tokens on protocol framing alone. gstack burns zero.
+The context overhead difference compounds fast. In a 20-command browser session, MCP tools burn 30,000-40,000 tokens on protocol framing alone. kstack burns zero.
 
 ### Why CLI over MCP?
 
@@ -190,7 +190,7 @@ MCP (Model Context Protocol) works well for remote services, but for local brows
 - **Connection fragility**: persistent WebSocket/stdio connections drop and fail to reconnect.
 - **Unnecessary abstraction**: Claude Code already has a Bash tool. A CLI that prints to stdout is the simplest possible interface.
 
-gstack skips all of this. Compiled binary. Plain text in, plain text out. No protocol. No schema. No connection management.
+kstack skips all of this. Compiled binary. Plain text in, plain text out. No protocol. No schema. No connection management.
 
 ## Acknowledgments
 
@@ -254,13 +254,13 @@ Tests spin up a local HTTP server (`browse/test/test-server.ts`) serving HTML fi
 
 ### Deploying to the active skill
 
-The active skill lives at `~/.claude/skills/gstack/`. After making changes:
+The active skill lives at `~/.claude/skills/kstack/`. After making changes:
 
 1. Push your branch
-2. Pull in the skill directory: `cd ~/.claude/skills/gstack && git pull`
-3. Rebuild: `cd ~/.claude/skills/gstack && bun run build`
+2. Pull in the skill directory: `cd ~/.claude/skills/kstack && git pull`
+3. Rebuild: `cd ~/.claude/skills/kstack && bun run build`
 
-Or copy the binary directly: `cp browse/dist/browse ~/.claude/skills/gstack/browse/dist/browse`
+Or copy the binary directly: `cp browse/dist/browse ~/.claude/skills/kstack/browse/dist/browse`
 
 ### Adding a new command
 

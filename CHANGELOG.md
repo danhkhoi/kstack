@@ -1,5 +1,7 @@
 # Changelog
 
+> **Note:** This project was rebranded from gstack → kstack after v0.9.8.0. Skills are now prefixed `kstack-*` (e.g., `/kstack-ship`). Historical entries below use the original unprefixed names.
+
 ## [0.9.8.0] - 2026-03-21 — Deploy Pipeline + E2E Performance
 
 ### Added

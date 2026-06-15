@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { findBugFixWindows, findCorrectionWindows } from '../src/heuristics';
+import { findBugFixWindows, findCorrectionWindows, findFalseCompletionWindows } from '../src/heuristics';
 import { parseTranscript } from '../src/transcript';
 import * as path from 'path';
 
@@ -63,5 +63,41 @@ describe('heuristics: corrections', () => {
       { role: 'user', kind: 'tool_result', isError: false, toolResultContent: 'no stop' },
     ] as any;
     expect(findCorrectionWindows(entries).length).toBe(0);
+  });
+});
+
+describe('heuristics: false completions', () => {
+  test('flags when Claude claims done and user rebuts within 2 turns', async () => {
+    const entries = await parseTranscript(path.join(import.meta.dir, 'fixtures', 'false-completion-session.jsonl'));
+    const windows = findFalseCompletionWindows(entries);
+    expect(windows.length).toBe(1);
+    expect(windows[0].kind).toBe('false-completion');
+  });
+
+  test('flags common completion claim phrases', () => {
+    const phrases = ['all done', 'tests pass', 'complete', 'finished', 'works now', 'fixed'];
+    for (const phrase of phrases) {
+      const entries = [
+        { role: 'assistant', kind: 'text', text: `I've ${phrase}` },
+        { role: 'user', kind: 'text', text: "actually that's not right" },
+      ] as any;
+      expect(findFalseCompletionWindows(entries).length).toBe(1);
+    }
+  });
+
+  test('does NOT flag when user turn is not a rebuttal', () => {
+    const entries = [
+      { role: 'assistant', kind: 'text', text: 'All done and fixed!' },
+      { role: 'user', kind: 'text', text: 'Great, thank you!' },
+    ] as any;
+    expect(findFalseCompletionWindows(entries).length).toBe(0);
+  });
+
+  test('does NOT flag completion claim without following rebuttal', () => {
+    const entries = [
+      { role: 'assistant', kind: 'text', text: 'All done!' },
+      { role: 'assistant', kind: 'text', text: 'Let me also add tests.' },
+    ] as any;
+    expect(findFalseCompletionWindows(entries).length).toBe(0);
   });
 });

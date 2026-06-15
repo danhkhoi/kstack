@@ -61,3 +61,28 @@ export function findCorrectionWindows(entries: TranscriptEntry[]): CandidateWind
   }
   return out;
 }
+
+const COMPLETION_CLAIM_RE = /\b(all done|tests pass|complete|finished|works now|fixed)\b/i;
+const REBUTTAL_RE = /\b(actually|didn't|wrong|still broken|you didn't|no it|not really)\b/i;
+
+export function findFalseCompletionWindows(entries: TranscriptEntry[]): CandidateWindow[] {
+  const out: CandidateWindow[] = [];
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i];
+    if (e.role !== 'assistant' || e.kind !== 'text') continue;
+    if (!COMPLETION_CLAIM_RE.test(extractText(e))) continue;
+    // Look for rebuttal in next 1-2 user-text entries
+    for (let j = i + 1; j <= Math.min(i + 2, entries.length - 1); j++) {
+      if (entries[j].role === 'user' && entries[j].kind === 'text' && REBUTTAL_RE.test(extractText(entries[j]))) {
+        out.push({
+          kind: 'false-completion',
+          startIdx: i,
+          endIdx: j,
+          entries: entries.slice(i, j + 1),
+        });
+        break;
+      }
+    }
+  }
+  return out;
+}

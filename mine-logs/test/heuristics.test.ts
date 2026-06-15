@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { findBugFixWindows } from '../src/heuristics';
+import { findBugFixWindows, findCorrectionWindows } from '../src/heuristics';
 import { parseTranscript } from '../src/transcript';
 import * as path from 'path';
 
@@ -28,5 +28,40 @@ describe('heuristics: bug-fix windows', () => {
 
   test('returns empty array on empty input', () => {
     expect(findBugFixWindows([])).toEqual([]);
+  });
+});
+
+describe('heuristics: corrections', () => {
+  test('flags user correction phrases', async () => {
+    const entries = await parseTranscript(path.join(import.meta.dir, 'fixtures', 'correction-session.jsonl'));
+    const windows = findCorrectionWindows(entries);
+    expect(windows.length).toBeGreaterThanOrEqual(1);
+    expect(windows[0].kind).toBe('correction');
+  });
+
+  test('matches no/don\'t/stop/instead/actually as leading words (case-insensitive)', () => {
+    const cases = ['No really', "Don't do that", 'Stop using X', 'Instead of that', 'Actually wait'];
+    for (const text of cases) {
+      const entries = [
+        { role: 'assistant', kind: 'text', text: 'did thing' },
+        { role: 'user', kind: 'text', text },
+      ] as any;
+      expect(findCorrectionWindows(entries).length).toBe(1);
+    }
+  });
+
+  test('does NOT flag user messages without correction phrases', () => {
+    const entries = [
+      { role: 'assistant', kind: 'text', text: 'did thing' },
+      { role: 'user', kind: 'text', text: 'looks good, thanks' },
+    ] as any;
+    expect(findCorrectionWindows(entries).length).toBe(0);
+  });
+
+  test('does NOT flag tool_result entries (only user-text)', () => {
+    const entries = [
+      { role: 'user', kind: 'tool_result', isError: false, toolResultContent: 'no stop' },
+    ] as any;
+    expect(findCorrectionWindows(entries).length).toBe(0);
   });
 });

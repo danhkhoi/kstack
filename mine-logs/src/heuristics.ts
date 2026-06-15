@@ -35,3 +35,29 @@ export function findBugFixWindows(entries: TranscriptEntry[]): CandidateWindow[]
   }
   return out;
 }
+
+const CORRECTION_RE = /^\s*(no\b|don't\b|do not\b|stop\b|instead\b|actually\b|use\s+\S+\s+not\b|that's wrong\b|that is wrong\b)/i;
+
+export function extractText(e: TranscriptEntry): string {
+  if (e.kind === 'text' && typeof e.text === 'string') return e.text;
+  return '';
+}
+
+export function findCorrectionWindows(entries: TranscriptEntry[]): CandidateWindow[] {
+  const out: CandidateWindow[] = [];
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i];
+    if (e.role !== 'user' || e.kind !== 'text') continue;
+    const text = extractText(e);
+    if (!CORRECTION_RE.test(text)) continue;
+    const start = Math.max(0, i - 2);
+    const end = Math.min(entries.length, i + 3);
+    out.push({
+      kind: 'correction',
+      startIdx: start,
+      endIdx: end,
+      entries: entries.slice(start, end),
+    });
+  }
+  return out;
+}

@@ -2,6 +2,12 @@
 
 > **Note:** This project was rebranded from gstack → kstack after v0.9.8.0. Skills are now prefixed `kstack-*` (e.g., `/kstack-ship`). Historical entries below use the original unprefixed names.
 
+## [Unreleased]
+
+### Added
+
+- **`/kstack-mine-logs` — turn your Claude Code corrections into a knowledge base.** Scans your session transcripts for this project, automatically finds patterns where you taught Claude something (error fixes, command corrections, "no don't do it that way", false "all done" claims, and mistakes that repeat across multiple sessions), and lets you review every candidate before saving. Tick `[x]` next to the keepers, then promote them to your auto-memory or a repo markdown file. Nothing is saved without your approval. Run `bun run mine-logs:extract` to start.
+
 ## [0.9.8.0] - 2026-03-21 — Deploy Pipeline + E2E Performance
 
 ### Added

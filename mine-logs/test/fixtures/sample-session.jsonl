@@ -1,0 +1,11 @@
+{"type":"system","subtype":"bridge_status","sessionId":"s1","uuid":"u0","timestamp":"2026-06-15T10:00:00Z","status":"ok"}
+
+{"type":"user","sessionId":"s1","uuid":"u1","parentUuid":null,"timestamp":"2026-06-15T10:00:01Z","message":{"role":"user","content":"please fix the bug in the parser"}}
+
+{"type":"assistant","sessionId":"s1","uuid":"u2","parentUuid":"u1","timestamp":"2026-06-15T10:00:02Z","message":{"role":"assistant","content":[{"type":"thinking","thinking":"the user wants a fix; I'll inspect first"},{"type":"tool_use","id":"toolu_01","name":"Read","input":{"file_path":"/tmp/parser.ts"}}]}}
+
+{not valid json
+
+{"type":"user","sessionId":"s1","uuid":"u3","parentUuid":"u2","timestamp":"2026-06-15T10:00:03Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01","content":"ENOENT: no such file","is_error":true}]}}
+
+{"type":"assistant","sessionId":"s1","uuid":"u4","parentUuid":"u3","timestamp":"2026-06-15T10:00:04Z","message":{"role":"assistant","content":[{"type":"text","text":"fixed!"}]}}

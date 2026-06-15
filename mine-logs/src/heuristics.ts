@@ -86,3 +86,48 @@ export function findFalseCompletionWindows(entries: TranscriptEntry[]): Candidat
   }
   return out;
 }
+
+export type RepeatedPattern = {
+  kind: 'repeated';
+  phrase: string;
+  sessions: { sessionId: string; idx: number }[];
+};
+
+function normalizePhrase(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120);
+}
+
+export function findRepeatedPatterns(
+  sessions: { sessionId: string; entries: TranscriptEntry[] }[]
+): RepeatedPattern[] {
+  // Map from normalized phrase → list of {sessionId, idx} occurrences
+  const seen = new Map<string, { sessionId: string; idx: number }[]>();
+
+  for (const { sessionId, entries } of sessions) {
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      if (e.role !== 'user' || e.kind !== 'text') continue;
+      const text = extractText(e);
+      if (!CORRECTION_RE.test(text)) continue;
+      const norm = normalizePhrase(text);
+      if (!norm) continue;
+      const list = seen.get(norm) ?? [];
+      list.push({ sessionId, idx: i });
+      seen.set(norm, list);
+    }
+  }
+
+  const out: RepeatedPattern[] = [];
+  for (const [phrase, occurrences] of seen) {
+    const distinctSessions = new Set(occurrences.map(o => o.sessionId));
+    if (distinctSessions.size >= 2) {
+      out.push({ kind: 'repeated', phrase, sessions: occurrences });
+    }
+  }
+  return out;
+}

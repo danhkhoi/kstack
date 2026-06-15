@@ -1,0 +1,1 @@
+{"type":"user","sessionId":"session-a","uuid":"ra-u1","parentUuid":null,"timestamp":"2026-06-15T10:00:01Z","message":{"role":"user","content":"stop using npm test, use bun test"}}

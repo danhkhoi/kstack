@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { findBugFixWindows, findCorrectionWindows, findFalseCompletionWindows } from '../src/heuristics';
+import { findBugFixWindows, findCorrectionWindows, findFalseCompletionWindows, findRepeatedPatterns } from '../src/heuristics';
 import { parseTranscript } from '../src/transcript';
 import * as path from 'path';
 
@@ -99,5 +99,43 @@ describe('heuristics: false completions', () => {
       { role: 'assistant', kind: 'text', text: 'Let me also add tests.' },
     ] as any;
     expect(findFalseCompletionWindows(entries).length).toBe(0);
+  });
+});
+
+describe('heuristics: repeated patterns', () => {
+  test('finds phrases repeated in 2+ distinct sessions', async () => {
+    const a = await parseTranscript(path.join(import.meta.dir, 'fixtures', 'repeat-a.jsonl'));
+    const b = await parseTranscript(path.join(import.meta.dir, 'fixtures', 'repeat-b.jsonl'));
+    const repeats = findRepeatedPatterns([
+      { sessionId: 'session-a', entries: a },
+      { sessionId: 'session-b', entries: b },
+    ]);
+    expect(repeats.length).toBeGreaterThanOrEqual(1);
+    expect(repeats[0].sessions.length).toBe(2);
+  });
+
+  test('does NOT flag phrases that appear in only one session', async () => {
+    const a = await parseTranscript(path.join(import.meta.dir, 'fixtures', 'repeat-a.jsonl'));
+    const repeats = findRepeatedPatterns([{ sessionId: 'session-a', entries: a }]);
+    expect(repeats.length).toBe(0);
+  });
+
+  test('counts distinct sessions not total occurrences', () => {
+    // Same phrase twice in same session should NOT count as repeated
+    const entries = [
+      { role: 'user', kind: 'text', text: 'stop using npm test' },
+      { role: 'user', kind: 'text', text: 'stop using npm test' },
+    ] as any;
+    const repeats = findRepeatedPatterns([{ sessionId: 'only-session', entries }]);
+    expect(repeats.length).toBe(0);
+  });
+
+  test('returns empty array when no correction phrases exist', () => {
+    const entries = [{ role: 'user', kind: 'text', text: 'looks good thanks' }] as any;
+    const repeats = findRepeatedPatterns([
+      { sessionId: 'a', entries },
+      { sessionId: 'b', entries },
+    ]);
+    expect(repeats.length).toBe(0);
   });
 });

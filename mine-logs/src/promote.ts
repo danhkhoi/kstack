@@ -29,9 +29,10 @@ export async function writeLessonToMemory(memoryDir: string, lesson: Lesson): Pr
   } catch { /* not present, continue */ }
 
   const memoryType = LESSON_TYPE_TO_MEMORY_TYPE[lesson.type] ?? 'feedback';
+  const nameSlug = slug.replace(/^lesson_/, '');
   const body = [
     '---',
-    `name: ${slug}`,
+    `name: ${nameSlug}`,
     `description: ${oneLine(lesson.lesson)}`,
     'metadata:',
     `  type: ${memoryType}`,

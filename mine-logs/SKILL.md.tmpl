@@ -1,0 +1,75 @@
+---
+name: kstack-mine-logs
+version: 1.0.0
+description: |
+  Mine Claude Code transcripts for reusable lessons — bug fix recipes,
+  corrections, env gotchas, repeated mistakes. Two phases: extract writes
+  LESSON_CANDIDATES.md with checkboxes; promote saves ticked lessons to
+  auto-memory or a repo file.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /kstack-mine-logs
+
+Extract reusable lessons from this project's Claude Code session transcripts.
+
+## When to use
+
+- After a long stretch of work where you've corrected Claude repeatedly
+- Before onboarding a teammate (mine your own corrections into a shared lessons file)
+- Periodically (monthly) to capture institutional knowledge before it's forgotten
+
+## How it works
+
+Two phases:
+
+**Phase 1: extract** scans `~/.claude/projects/<this-project>/*.jsonl`, runs a
+heuristic pre-filter (error windows, correction phrases, false completions,
+cross-session repeats), then asks Claude Sonnet to judge each candidate.
+Writes `LESSON_CANDIDATES.md` with checkbox items.
+
+**Phase 2: promote** reads ticked lessons (you tick `[x] keep` on keepers),
+asks where to save them, then writes to either auto-memory or a markdown file.
+
+## Usage
+
+```bash
+# Phase 1: scan transcripts and write candidates (~$0.10/run, Sonnet 4.6)
+ANTHROPIC_API_KEY=<key> bun mine-logs/src/cli.ts extract
+
+# Review LESSON_CANDIDATES.md — change [ ] to [x] for keepers
+
+# Phase 2: promote ticked lessons
+bun mine-logs/src/cli.ts promote
+# Prompts: (1) auto-memory  (2) repo MD file  (3) cancel
+```
+
+## What gets extracted
+
+- **Bug fix recipes** — error → root cause → fix patterns (tool error + 3+ recovery calls)
+- **Corrections** — phrases like "no", "don't", "stop", "instead", "actually"
+- **False completions** — Claude claimed done; user pushed back within 2 turns
+- **Repeated mistakes** — same correction phrase across 2+ sessions (strongest signal)
+
+## Output destinations
+
+**Auto-memory** (recommended for personal lessons): writes to
+`~/.claude/projects/<proj>/memory/lesson_<slug>.md` with frontmatter.
+Auto-loaded into context via `MEMORY.md` in future sessions.
+
+**Repo MD file** (recommended for team-shareable lessons): appends to a file
+in the repo under a dated `## Lessons learned` header. Commit it so teammates benefit.
+
+## Notes
+
+- `LESSON_CANDIDATES.md` is NOT gitignored — commit it if you want to preserve the review trail.
+- Unticked candidates stay in the file; re-run promote anytime to process them.
+- Already-promoted lessons are deduped on re-extract (compared by slug) — safe to re-run.
+- Requires `ANTHROPIC_API_KEY` for the extract phase only.

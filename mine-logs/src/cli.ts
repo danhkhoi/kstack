@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { runExtract } from './extract';
+import { runPromote } from './promote';
 
 const [subcommand] = process.argv.slice(2);
 
@@ -8,8 +9,7 @@ switch (subcommand) {
     await runExtract();
     break;
   case 'promote':
-    console.log('promote: not yet implemented');
-    process.exit(0);
+    await runPromote();
     break;
   default:
     console.error('usage: mine-logs <extract|promote>');

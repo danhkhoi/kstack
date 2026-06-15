@@ -5,7 +5,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { projectLogDir, cwdToProjectKey } from './project-path';
 import { parseTranscript } from './transcript';
 import { findBugFixWindows, findCorrectionWindows, findFalseCompletionWindows, findRepeatedPatterns } from './heuristics';
-import type { CandidateWindow } from './heuristics';
+import type { CandidateWindow, RepeatedPattern } from './heuristics';
 import { extractLesson, type Lesson } from './llm';
 import { writeCandidates } from './candidates';
 import { titleToSlug, dedupAgainstMemory } from './dedup';
@@ -49,7 +49,22 @@ export async function runExtract(cwd: string = process.cwd()): Promise<void> {
   }
 
   const repeatedPatterns = findRepeatedPatterns(perSession);
-  console.log(`Heuristic stage: ${allWindows.length} windows + ${repeatedPatterns.length} cross-session repeated patterns`);
+  // Convert repeated patterns into synthetic CandidateWindows for the LLM stage
+  for (const rp of repeatedPatterns) {
+    const syntheticEntry = {
+      role: 'user' as const,
+      kind: 'text' as const,
+      text: `[Repeated correction across ${rp.sessions.length} sessions]: "${rp.phrase}"`,
+      timestamp: undefined,
+      sessionId: undefined,
+      uuid: undefined,
+    };
+    allWindows.push({
+      sessionId: rp.sessions.map(s => s.sessionId).join(','),
+      window: { kind: 'repeated', startIdx: 0, endIdx: 0, entries: [syntheticEntry] },
+    });
+  }
+  console.log(`Heuristic stage: ${allWindows.length - repeatedPatterns.length} single-session windows + ${repeatedPatterns.length} cross-session repeated patterns`);
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {

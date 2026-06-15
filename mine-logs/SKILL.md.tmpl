@@ -70,6 +70,7 @@ in the repo under a dated `## Lessons learned` header. Commit it so teammates be
 ## Notes
 
 - `LESSON_CANDIDATES.md` is NOT gitignored — commit it if you want to preserve the review trail.
-- Unticked candidates stay in the file; re-run promote anytime to process them.
-- Already-promoted lessons are deduped on re-extract (compared by slug) — safe to re-run.
+- Unticked candidates stay in the file between promote runs — promote processes only ticked items.
+- Re-running extract **overwrites** `LESSON_CANDIDATES.md`. Review and promote before re-extracting.
+- Already-promoted lessons are deduped on re-extract (compared by slug) — they won't reappear.
 - Requires `ANTHROPIC_API_KEY` for the extract phase only.

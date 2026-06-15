@@ -122,7 +122,13 @@ export async function runPromote(cwd: string = process.cwd()): Promise<void> {
     console.log(`\nDone. ${written} written, ${skipped} skipped.`);
   } else if (answer === '2') {
     const targetRaw = (await rl.question('File path (default: LESSONS.md): ')).trim();
-    const target = path.join(cwd, targetRaw || 'LESSONS.md');
+    const resolved = path.resolve(cwd, targetRaw || 'LESSONS.md');
+    if (!resolved.startsWith(cwd + path.sep) && resolved !== path.resolve(cwd, 'LESSONS.md')) {
+      console.error('Error: target path must be within the project directory.');
+      rl.close();
+      return;
+    }
+    const target = resolved;
     await appendLessonsToFile(target, ticked);
     console.log(`✓ Appended ${ticked.length} lesson(s) to ${target}`);
   } else {
